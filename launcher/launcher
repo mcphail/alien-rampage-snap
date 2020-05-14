@@ -9,7 +9,7 @@ fail () {
 
 GAMEDIR=alien-rampage
 
-if [ ! -d $SNAP_USER_DATA/$GAMEDIR/demo ];
+if [ ! -d $SNAP_USER_DATA/$GAMEDIR/game ];
 then
 	echo "Game directory does not exist"
 	echo "Creating directory"
