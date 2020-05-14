@@ -1,0 +1,28 @@
+#! /bin/bash
+
+set -e
+set -o pipefail
+
+fail () {
+	yad --width=300 --title="$1" --text="$2" --text-align=center --button=gtk-ok:1 --center
+}
+
+GAMEDIR=alien-rampage
+
+if [ ! -d $SNAP_USER_DATA/$GAMEDIR/demo ];
+then
+	echo "Game directory does not exist"
+	echo "Creating directory"
+	mkdir -p $SNAP_USER_DATA/$GAMEDIR
+	echo "Copying game to directory"
+	cd $SNAP_USER_DATA/$GAMEDIR
+	wget https://archive.org/download/msdos_sdramp_shareware/msdos_sdramp_shareware.zip -t 5 --timeout 10 2>&1 | \
+	perl -p -e '$| = 1; s/^.* +([0-9]+%) +([0-9,.]+[GMKB]) +([0-9hms,.]+).*$/\1\n# Downloading... \2 (\3)/' | \
+	yad --progress --title="Downloading Alien Rampage" --width=400 --center --no-buttons --auto-close --auto-kill --on-top --no-escape \
+	|| fail "Network Error" "Could not access network to download game files.\n\nPlease check the network status."
+	unzip -d game msdos_sdramp_shareware.zip \
+	|| fail "Error" "Could not extract game files.\n\nThe download may have been corrupted"
+fi
+
+cd $SNAP_USER_DATA/$GAMEDIR/game
+dosbox RAMPAGE.EXE -exit -scaler normal3x

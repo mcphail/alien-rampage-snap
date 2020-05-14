@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Alien Rampage
+Exec=alien-rampage
+Comment=Shareware version of Alien Rampage
+Type=Application
+Icon=${SNAP}/alien-rampage.png
+Categories=Game;
+StartupNotify=true

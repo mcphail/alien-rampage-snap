@@ -1,0 +1,63 @@
+name: alien-rampage
+version: '0.1'
+summary: Alien Rampage Shareware
+base: core18
+description: |
+  Shareware version of Alien Rampage, a classic DOS shooter and platformer
+
+grade: stable
+confinement: strict
+parts:
+  launch:
+    plugin: dump
+    source: launcher
+    stage-packages:
+      - wget
+      - unzip
+      - libpng16-16
+      - libgl1-mesa-glx
+      - libslang2
+      - libglu1-mesa
+      - yad
+      - perl-base
+    prime:
+      - -share
+      - -usr/share/doc
+      - -usr/share/lintian
+      - -usr/share/man
+      - -usr/share/icons
+
+  dosbox-staging:
+    source: https://github.com/dreamer/dosbox-staging.git
+    plugin: autotools
+    build-packages:
+      - xvfb
+      - libtool
+      - build-essential
+      - libsdl2-dev
+      - libsdl2-net-dev
+      - libncurses-dev
+      - libopusfile-dev
+    stage-packages:
+      - libsdl2-2.0-0
+      - libsdl2-net-2.0-0
+      - libopusfile0
+
+  cleanup:
+    after: [launch, dosbox-staging]
+    plugin: nil
+    build-snaps:
+      - core18
+      - gtk-common-themes
+      - gnome-3-28-1804
+    override-prime: |
+      set -eux
+      for snap in "core18" "gtk-common-themes" "gnome-3-28-1804"; do
+        cd "/snap/$snap/current" && find . -type f,l -exec rm -r "$SNAPCRAFT_PRIME/{}" \;
+      done
+
+apps:
+  alien-rampage:
+    plugs: [desktop, desktop-legacy, unity7, audio-playback, opengl, network, x11, joystick]
+    command: launcher
+    extensions: [gnome-3-28]
